@@ -1,0 +1,28 @@
+
+// Regions collection
+// These are synchronized to client
+[
+    {
+        "name": "Houston",
+        "bound_west": -95.93811,
+        "bound_east": -94.44397,
+        "bound_north": 30.192618,
+        "bound_south": 29.089777,
+        "num_samples_lat": 40,
+        "num_samples_lon": 40,
+        "affecting_sites": ["48_231_1006", "48_085_0009", ...]
+    }
+]
+
+// document structure for InterpolatedData (region+epoch) collection
+// will send example data soon
+{
+    "region": "abc",
+    "epoch": "20170601043000",
+    "data": []
+}
+
+// Meteor method
+// client requests region data for a timestamp
+// should return the entire document for this region+epoch
+loadRegionData(region_id, epoch)

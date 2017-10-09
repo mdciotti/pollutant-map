@@ -1,0 +1,142 @@
+
+body {
+    /* font-family: 'Neuton', serif; */
+    font-family: 'Montserrat', sans-serif; 
+    font-size: 18px;
+    font-weight: 300;
+    color: rgba(221, 221, 255, 1);
+}
+
+#side-panel {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+}
+
+#btn-collapse {
+    position: absolute;
+    z-index: 0;
+    cursor: pointer;
+    left: 100%;
+    top: 6px;
+    width: 24px;
+    height: 48px;
+    background: #111111;
+    opacity: 0.6;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+}
+
+#location-search {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    right: 6px;
+    padding: 12px;
+}
+
+#side-panel .contents {
+    overflow: auto;
+    width: 480px;
+    height: 100%;
+    background: #141e30;
+    background: -webkit-linear-gradient(to bottom, #141e30, #243b55);
+    background: linear-gradient(to bottom, #141e30, #243b55);
+    box-shadow: 0 0 24px rgba(0, 0, 0, 0.5);
+    /* padding: 24px; */
+}
+
+#side-panel section {
+    padding-bottom: 24px;
+}
+
+#side-panel section h2 {
+    margin: 24px 24px 12px 24px;
+    font-size: 24px;
+    font-weight: 300;
+    padding-bottom: 6px;
+    border-bottom: thin solid rgba(204, 204, 238, 0.25);
+}
+
+#search-bar {
+    /* background:  */
+}
+
+#search-field {
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    background: none;
+    font: inherit;
+}
+
+.site {
+    /* margin: 12px 0; */
+    padding: 12px 24px;
+    border-top: thin solid transparent;
+    border-bottom: thin solid transparent;
+    cursor: default;
+}
+
+.site:hover {
+    background-color: rgba(204, 204, 238, 0.1);
+    border-color: rgba(204, 204, 238, 0.25);
+}
+
+.site .AQI {
+    font-size: 72px;
+    font-weight: 100;
+    /* color: white; */
+    float: left;
+    line-height: 1;
+    margin-right: 24px;
+}
+
+.site .details {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    line-height: 1.5;
+    position: relative;
+}
+
+.site .details .time {
+    position: absolute;
+    top: 6px;
+    right: 0;
+    line-height: 1;
+    font-size: 12px;
+    opacity: 0.75;
+}
+
+.site .pollutants {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
+    color: rgba(221, 221, 255, 0.5);
+}
+
+.site .pollutants li {
+    display: inline-block;
+    margin: 6px 12px 6px 0;
+}
+
+.site .pollutants .value {
+    font-weight: 400;
+    margin-left: 3px;
+    color: rgba(221, 221, 255, 0.75);
+}
+
+.AQI-category {
+    color: white;
+    padding: 3px 9px;
+    font-size: 12px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    /* font-family: 'Open Sans', sans-serif; */
+    font-weight: 600;
+    cursor: default;
+}
+
+.AQI-good { background-color: #00cc58; color: #006629; }
