@@ -10,8 +10,38 @@ Project Structure
 Development is happening in a few streams, which will eventually be merged:
 
 - [extras/colormap.html](https://mdciotti.github.io/pollutant-map/extras/colormap.html) - implementation of WebGL color map and cubic data interpolation
-- [src/]() - implementation of React + Deck.GL
+- [src/]() - implementation of React + deck.gl
 - Not in this repo - Meteor + MongoDB backend
+
+
+Development
+-----------
+
+To build the React project, first run
+
+    npm install
+
+then you can run the automated development server using
+
+    npm run start
+
+To build for production deployment, run
+
+    npm run build
+
+which will output files into a `build/` directory. These can then be served with a static server:
+
+    npm install -g serve
+    serve -s build
+
+
+### Requirements
+
+This project depends on:
+
+- [React](https://reactjs.org) for frontend and user interface
+- [deck.gl](https://uber.github.io/deck.gl/) for map-based visualization interface (based on top of [luma.gl](https://uber.github.io/luma.gl/) and [MapBox](https://www.mapbox.com))
+- [Meteor](https://www.meteor.com)
 
 
 Implementation Details
@@ -68,4 +98,4 @@ The 2D grid data for a single region at a single point of time is defined by:
 - [UNDECIDED] the list of sites that were used to compute this data
 - the data itself (2D array)
 
-The regions and 2D grid data are synchronized in real-time (via Meteor) to the front-end, where the data is displayed in a custom Deck.GL layer over MapboxGL. The UI should allow for a heatmap or contour-based visualization with variable levels of discretization and color mapping. This is achieved through a bicubic interpolation of the grid data and subsequent color lookup from the color map. Additionally, the UI should allow for animation through time (linear interpolation), so several grid data sets must be loaded in at once. The user should be able to select different pollutants or measurements to display, and be able to select a date/time to view.
+The regions and 2D grid data are synchronized in real-time (via Meteor) to the front-end, where the data is displayed in a custom deck.gl layer over MapboxGL. The UI should allow for a heatmap or contour-based visualization with variable levels of discretization and color mapping. This is achieved through a bicubic interpolation of the grid data and subsequent color lookup from the color map. Additionally, the UI should allow for animation through time (linear interpolation), so several grid data sets must be loaded in at once. The user should be able to select different pollutants or measurements to display, and be able to select a date/time to view.
