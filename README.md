@@ -10,7 +10,7 @@ Project Structure
 Development is happening in a few streams, which will eventually be merged:
 
 - [extras/colormap.html](https://mdciotti.github.io/pollutant-map/extras/colormap.html) - implementation of WebGL color map and cubic data interpolation
-- [src/](https://mdciotti.github.io/pollutant-map/build/) - implementation of React + deck.gl
+- [src/](https://mdciotti.github.io/pollutant-map/) - implementation of React + deck.gl
 - Not in this repo - Meteor + MongoDB backend
 
 
@@ -33,6 +33,10 @@ which will output files into a `build/` directory. These can then be served with
 
     npm install -g serve
     serve -s build
+
+or deployed to GitHub pages directly (in the `gh-pages` branch) which is automated by the command
+
+    npm run deploy
 
 
 ### Requirements
