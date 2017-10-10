@@ -10,7 +10,7 @@ Project Structure
 Development is happening in a few streams, which will eventually be merged:
 
 - [extras/colormap.html](https://mdciotti.github.io/pollutant-map/extras/colormap.html) - implementation of WebGL color map and cubic data interpolation
-- [src/]() - implementation of React + deck.gl
+- [src/](https://mdciotti.github.io/pollutant-map/build/) - implementation of React + deck.gl
 - Not in this repo - Meteor + MongoDB backend
 
 
