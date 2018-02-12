@@ -44,7 +44,7 @@ or deployed to GitHub pages directly (in the `gh-pages` branch) which is automat
 This project depends on:
 
 - [React](https://reactjs.org) for frontend and user interface
-- [deck.gl](https://uber.github.io/deck.gl/) for map-based visualization interface (based on top of [luma.gl](https://uber.github.io/luma.gl/) and [MapBox](https://www.mapbox.com))
+- [deck.gl](https://uber.github.io/deck.gl/) for map-based visualization interface (based on top of [luma.gl](https://uber.github.io/luma.gl/) and [Mapbox](https://www.mapbox.com))
 - [Meteor](https://www.meteor.com)
 
 

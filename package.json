@@ -5,6 +5,7 @@
   "homepage": "http://mdciotti.github.io/pollutant-map",
   "dependencies": {
     "deck.gl": "4.1.2",
+    "glslify": "6.1.0",
     "luma.gl": "4.0.2",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
