@@ -62,10 +62,7 @@ export default class ColorMapLayer extends Layer {
         // if (!data_loaded) return;
         const {gl} = this.context;
         const {model, textureFrom, textureTo, width, height, delta, timeInterval, colorMapTexture} = this.state;
-        const {bbox, dataTextureArray, interpolationMode, colorMap} = this.props;
-
-        // console.log(width, height);
-        // console.log(dataTextureArray[timeInterval | 0]);
+        const {dataTextureArray, interpolationMode, colorMap, opacity} = this.props;
 
         textureFrom.setImageData({
             pixels: dataTextureArray[timeInterval | 0],
@@ -88,7 +85,7 @@ export default class ColorMapLayer extends Layer {
         colorMapTexture.setImageData({
             pixels: colorMap.canvas,
             format: gl.RGBA,
-            type: gl.UINT8,
+            type: gl.UNSIGNED_BYTE,
             dataFormat: gl.RGBA
         });
 
@@ -98,12 +95,12 @@ export default class ColorMapLayer extends Layer {
             depthFunc: gl.LEQUAL
         };
 
-        // uniforms['bbox'] = [bbox.minLng, bbox.maxLng, bbox.minLat, bbox.maxLat];
         uniforms['uData0Sampler'] = textureFrom;
         uniforms['uData1Sampler'] = textureTo;
         uniforms['uColorScaleSampler'] = colorMapTexture;
         uniforms['k_noise'] = 0.035;
         uniforms['k_alpha'] = 0.5;
+        uniforms['k_opacity'] = opacity;
         uniforms['frame'] = delta;
         uniforms['interpolationMode'] = interpolationMode;
 
@@ -112,10 +109,6 @@ export default class ColorMapLayer extends Layer {
     }
 
     getModel({gl, bbox}) {
-        // const positions = this.calculatePositions({bbox});
-        // const vertices = new Float32Array([0.3, 0, 250, 0, 0.1, 0, 1, 0, 0, 0, -0.1, 0, 0, 0.1, 0]);
-        // const normals = new Float32Array([0, 0, 1, 0, 0.1, 0, 1, 0, 0, 0, -0.1, 0, 0, 0.1, 0]);
-
         const vertices = new Float32Array([
             bbox.minLng, bbox.minLat, 0.0,
             bbox.minLng, bbox.maxLat, 0.0,
@@ -161,7 +154,7 @@ export default class ColorMapLayer extends Layer {
                 [gl.TEXTURE_WRAP_S]: gl.CLAMP_TO_EDGE,
                 [gl.TEXTURE_WRAP_T]: gl.CLAMP_TO_EDGE
             },
-            pixelStore: {[gl.UNPACK_FLIP_Y_WEBGL]: true}
+            pixelStore: {[gl.UNPACK_FLIP_Y_WEBGL]: false}
         }, opt);
 
         return new Texture2D(gl, textureOptions);
@@ -175,6 +168,7 @@ ColorMapLayer.defaultProps = {
     dataTextureArray: [],
     dataTextureSize: { width: 124, height: 154 },
     time: 0,
+    opacity: 0.9,
     interpolationMode: 0,
     colorMap: null
 };

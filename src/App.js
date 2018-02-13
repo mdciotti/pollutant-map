@@ -72,8 +72,9 @@ export default class App extends Component {
                     new ColorMapLayer({
                         id: 'color-layer',
                         bbox,
-                        colorMap: rainbow.canvas,
+                        colorMap: rainbow,
                         time: 0,
+                        opacity: 0.9,
                         dataTextureArray
                     })
                 ]} />

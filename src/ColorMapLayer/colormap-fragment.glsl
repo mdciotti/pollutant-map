@@ -10,6 +10,7 @@ uniform sampler2D uData1Sampler;
 uniform sampler2D uColorScaleSampler;
 uniform float k_noise;
 uniform float k_alpha;
+uniform float k_opacity;
 uniform float frame;
 uniform vec2 texSize0;
 uniform vec2 texSize1;
@@ -112,7 +113,7 @@ void main() {
 
     float val = clamp(samp.r + noise, 0.0, 255.0 / 256.0);
     vec4 mapped_frag = texture2D(uColorScaleSampler, vec2(0.0, val));
-    // gl_FragColor = mapped_frag;
+    gl_FragColor = vec4(mapped_frag.rgb, k_opacity);
     // gl_FragColor = vec4(1.0, 0.0, 0.0, samp.r/2.0 + 0.5);
-    gl_FragColor = vec4(vec3(samp.r), 0.9);
+    // gl_FragColor = vec4(vec3(samp.r), 0.9);
 }
