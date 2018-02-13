@@ -1,28 +1,9 @@
 
 import { Layer } from 'deck.gl';
 import { GL, Model, Geometry, loadTextures, Texture2D } from 'luma.gl';
-// import glslify from 'glslify';
 
-// import colormap_fs from './colormap-fragment.glsl';
-// import colormap_vs from './colormap-vertex.glsl';
-
-const vertex = `
-#define SHADER_NAME solid-polygon-layer-vertex-shader
-attribute vec3 vertices;
-void main(void) {
-    vec4 position_worldspace = vec4(project_position(vertices), 1.0);
-    gl_Position = project_to_clipspace(position_worldspace);
-}`;
-
-const fragment = `
-#define SHADER_NAME solid-polygon-layer-fragment-shader
-#ifdef GL_ES
-precision highp float;
-#endif
-void main(void) {
-    gl_FragColor = vec4(vec3(0.0), 1.0);
-}
-`;
+import fragment from './colormap-fragment.glsl';
+import vertex from './colormap-vertex.glsl';
 
 export default class ColorMapLayer extends Layer {
     initializeState() {
@@ -75,7 +56,7 @@ export default class ColorMapLayer extends Layer {
         // if (!data_loaded) return;
         const {gl} = this.context;
         const {model, textureFrom, textureTo, width, height, delta, timeInterval} = this.state;
-        const {bbox, dataTextureArray} = this.props;
+        const {bbox, dataTextureArray, interpolationMode} = this.props;
 
         textureFrom.setImageData({
             pixels: dataTextureArray[timeInterval | 0],
@@ -108,6 +89,7 @@ export default class ColorMapLayer extends Layer {
         uniforms['k_noise'] = 0.035;
         uniforms['k_alpha'] = 0.5;
         uniforms['frame'] = delta;
+        uniforms['interpolationMode'] = interpolationMode;
 
         model.draw({uniforms, parameters});
         gl.bindTexture(gl.TEXTURE_2D, null);
@@ -125,11 +107,20 @@ export default class ColorMapLayer extends Layer {
             bbox.maxLng, bbox.minLat, 0.0
         ]);
 
+        const texCoords = new Float32Array([
+            0.0, 0.0,
+            0.0, 1.0,
+            1.0, 1.0,
+            1.0, 0.0
+        ]);
+
         const geometry = new Geometry({
             id: this.props.id,
             drawMode: GL.TRIANGLE_FAN,
+            vertexCount: 4,
             attributes: {
-                vertices: {size: 3, type: gl.FLOAT, value: vertices}
+                aVertexPosition: {size: 3, type: gl.FLOAT, value: vertices},
+                aTextureCoord: {size: 2, type: gl.FLOAT, value: texCoords}
             }
         });
 
@@ -167,5 +158,6 @@ ColorMapLayer.defaultProps = {
     dataBounds: null,
     dataTextureArray: [],
     dataTextureSize: { width: 124, height: 154 },
-    time: 0
+    time: 0,
+    interpolationMode: 0
 };

@@ -109,13 +109,15 @@ vec4 overlay(vec4 a, vec4 b) {
 
 void main() {
     vec4 samp0, samp1, samp;
-    // if (interpolationMode == 0) {
-    //     samp0 = bicubic(uData0Sampler, vTextureCoord, texSize0);
-    //     samp1 = bicubic(uData1Sampler, vTextureCoord, texSize1);
-    // } else {
+    if (interpolationMode == 0) {
+        // Use hardware filtering (bilinear or nearest neighbor)
         samp0 = texture2D(uData0Sampler, vTextureCoord);
         samp1 = texture2D(uData1Sampler, vTextureCoord);
-    // }
+    } else {
+        // Use custom bicubic filtering
+        samp0 = bicubic(uData0Sampler, vTextureCoord, texSize0);
+        samp1 = bicubic(uData1Sampler, vTextureCoord, texSize1);
+    }
     samp = mix(samp0, samp1, frame);
     // samp = samp0;
 
