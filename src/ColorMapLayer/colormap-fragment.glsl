@@ -8,7 +8,6 @@ varying vec2 vTextureCoord;
 uniform sampler2D uData0Sampler;
 uniform sampler2D uData1Sampler;
 uniform sampler2D uColorScaleSampler;
-uniform sampler2D uMapSampler;
 uniform float k_noise;
 uniform float k_alpha;
 uniform float frame;
@@ -40,8 +39,12 @@ float bezier(float t, vec4 ww) {
     return dot(ww*ss*tt, cc);
 }
 
+// Tangent-approximation of inverse cumulative normal distribution
+// Map a value t in [0, 1] to [-0.5, 0.5] such that the values
+// are compressed near 0, with compression factor k
 float tang(float t, float k) {
     float pi = 3.141592653582;
+    if (k <= 0.001) return t - 0.5;
     return tan(k*pi*(t - 0.5)) / (2.0*tan(0.5*k*pi));
 }
 
@@ -90,23 +93,6 @@ vec4 bicubic(sampler2D texture, vec2 texcoord, vec2 texSize)
     );
 }
 
-float luma(vec4 a) {
-    return dot(a.rgb, vec3(1.0)) / 3.0;
-}
-
-vec4 multiply(vec4 a, vec4 b) {
-    return a * b;
-}
-
-vec4 screen(vec4 a, vec4 b) {
-    return vec4(1.0) - (vec4(1.0) - a) * (vec4(1.0) - b);
-}
-
-vec4 overlay(vec4 a, vec4 b) {
-    if (luma(a) < 0.5) return vec4(2.0) * a * b;
-    else return vec4(1.0) - vec4(2.0) * (vec4(1.0) - a) * (vec4(1.0) - b);
-}
-
 void main() {
     vec4 samp0, samp1, samp;
     if (interpolationMode == 0) {
@@ -119,7 +105,6 @@ void main() {
         samp1 = bicubic(uData1Sampler, vTextureCoord, texSize1);
     }
     samp = mix(samp0, samp1, frame);
-    // samp = samp0;
 
     float noise_uniform = rand(vTextureCoord);
     float noise = k_noise * tang(noise_uniform, sqrt(k_alpha));
@@ -127,10 +112,7 @@ void main() {
 
     float val = clamp(samp.r + noise, 0.0, 255.0 / 256.0);
     vec4 mapped_frag = texture2D(uColorScaleSampler, vec2(0.0, val));
-    // vec4 bg_frag = texture2D(uMapSampler, vTextureCoord);
-    // gl_FragColor = mix(mapped_frag, bg_frag, k_alpha);
-    // gl_FragColor = (mapped_frag + bg_frag) / (vec4(1.0) + bg_frag);
-    // gl_FragColor = overlay(mapped_frag, bg_frag);
     // gl_FragColor = mapped_frag;
-    gl_FragColor = vec4(1.0);
+    // gl_FragColor = vec4(1.0, 0.0, 0.0, samp.r/2.0 + 0.5);
+    gl_FragColor = vec4(vec3(samp.r), 0.9);
 }

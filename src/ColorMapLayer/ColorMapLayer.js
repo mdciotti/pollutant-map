@@ -29,13 +29,19 @@ export default class ColorMapLayer extends Layer {
         const {width, height} = dataTextureSize;
         const textureFrom = this.createTexture(gl, {});
         const textureTo = this.createTexture(gl, {});
+        const colorMapTexture = this.createTexture(gl, {
+            format: gl.RGBA,
+            type: gl.UINT8,
+            dataFormat: gl.RGBA
+        });
         
         this.setState({
             model,
             textureFrom,
             textureTo,
             width,
-            height
+            height,
+            colorMapTexture
         });
     }
 
@@ -55,24 +61,34 @@ export default class ColorMapLayer extends Layer {
     draw({uniforms}) {
         // if (!data_loaded) return;
         const {gl} = this.context;
-        const {model, textureFrom, textureTo, width, height, delta, timeInterval} = this.state;
-        const {bbox, dataTextureArray, interpolationMode} = this.props;
+        const {model, textureFrom, textureTo, width, height, delta, timeInterval, colorMapTexture} = this.state;
+        const {bbox, dataTextureArray, interpolationMode, colorMap} = this.props;
+
+        // console.log(width, height);
+        // console.log(dataTextureArray[timeInterval | 0]);
 
         textureFrom.setImageData({
             pixels: dataTextureArray[timeInterval | 0],
             width,
             height,
-            format: gl.RGBA32F,
+            format: gl.R32F,
             type: gl.FLOAT,
-            dataFormat: gl.RGBA
+            dataFormat: gl.RED
         });
 
         textureTo.setImageData({
             pixels: dataTextureArray[(timeInterval + 1) | 0],
             width,
             height,
-            format: gl.RGBA32F,
+            format: gl.R32F,
             type: gl.FLOAT,
+            dataFormat: gl.RED
+        });
+
+        colorMapTexture.setImageData({
+            pixels: colorMap.canvas,
+            format: gl.RGBA,
+            type: gl.UINT8,
             dataFormat: gl.RGBA
         });
 
@@ -82,10 +98,10 @@ export default class ColorMapLayer extends Layer {
             depthFunc: gl.LEQUAL
         };
 
-        uniforms['bbox'] = [bbox.minLng, bbox.maxLng, bbox.minLat, bbox.maxLat];
+        // uniforms['bbox'] = [bbox.minLng, bbox.maxLng, bbox.minLat, bbox.maxLat];
         uniforms['uData0Sampler'] = textureFrom;
         uniforms['uData1Sampler'] = textureTo;
-        uniforms['uColorScaleSampler'] = null;
+        uniforms['uColorScaleSampler'] = colorMapTexture;
         uniforms['k_noise'] = 0.035;
         uniforms['k_alpha'] = 0.5;
         uniforms['frame'] = delta;
@@ -159,5 +175,6 @@ ColorMapLayer.defaultProps = {
     dataTextureArray: [],
     dataTextureSize: { width: 124, height: 154 },
     time: 0,
-    interpolationMode: 0
+    interpolationMode: 0,
+    colorMap: null
 };
