@@ -30,9 +30,9 @@ export default class ColorMapLayer extends Layer {
         const textureFrom = this.createTexture(gl, {});
         const textureTo = this.createTexture(gl, {});
         const colorMapTexture = this.createTexture(gl, {
-            format: gl.RGBA,
-            type: gl.UINT8,
-            dataFormat: gl.RGBA
+            format: gl.RGB32F,
+            type: gl.FLOAT,
+            dataFormat: gl.RGB
         });
         
         this.setState({
@@ -83,10 +83,12 @@ export default class ColorMapLayer extends Layer {
         });
 
         colorMapTexture.setImageData({
-            pixels: colorMap.canvas,
-            format: gl.RGBA,
-            type: gl.UNSIGNED_BYTE,
-            dataFormat: gl.RGBA
+            pixels: colorMap,
+            width: 1,
+            height: colorMap.length / 3,
+            format: gl.RGB32F,
+            type: gl.FLOAT,
+            dataFormat: gl.RGB
         });
 
         const parameters = {
@@ -117,10 +119,10 @@ export default class ColorMapLayer extends Layer {
         ]);
 
         const texCoords = new Float32Array([
+            1.0, 1.0,
+            1.0, 0.0,
             0.0, 0.0,
             0.0, 1.0,
-            1.0, 1.0,
-            1.0, 0.0
         ]);
 
         const geometry = new Geometry({
@@ -145,16 +147,18 @@ export default class ColorMapLayer extends Layer {
 
     createTexture(gl, opt) {
         const textureOptions = Object.assign({
-            format: gl.RGBA32F,
-            dataFormat: gl.RGBA,
+            format: gl.R32F,
+            dataFormat: gl.RED,
             type: gl.FLOAT,
             parameters: {
-                [gl.TEXTURE_MAG_FILTER]: gl.NEAREST,
-                [gl.TEXTURE_MIN_FILTER]: gl.NEAREST,
+                // [gl.TEXTURE_MAG_FILTER]: gl.NEAREST,
+                // [gl.TEXTURE_MIN_FILTER]: gl.NEAREST,
+                [gl.TEXTURE_MAG_FILTER]: gl.LINEAR,
+                [gl.TEXTURE_MIN_FILTER]: gl.LINEAR,
                 [gl.TEXTURE_WRAP_S]: gl.CLAMP_TO_EDGE,
                 [gl.TEXTURE_WRAP_T]: gl.CLAMP_TO_EDGE
             },
-            pixelStore: {[gl.UNPACK_FLIP_Y_WEBGL]: false}
+            pixelStore: {[gl.UNPACK_FLIP_Y_WEBGL]: true}
         }, opt);
 
         return new Texture2D(gl, textureOptions);

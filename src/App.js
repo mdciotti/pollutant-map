@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 // import logo from './logo.svg';
 // import './App.css';
 import MapGL from 'react-map-gl';
@@ -6,6 +7,7 @@ import DeckGL from 'deck.gl';
 
 import ColorMapLayer from './ColorMapLayer/ColorMapLayer.js';
 import LUT from './LUT.js';
+import cmaps from './cmaps';
 import gridData from './gridData_1362117600.js';
 // data: 124x154
 const west = -95.91;
@@ -25,19 +27,45 @@ function flatten(arr) {
     }, []);
 }
 
-const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoibWRjaW90dGkiLCJhIjoiY2l1cWdyamw5MDAxcTJ2bGFmdzJxdGFyNyJ9.2b6aTKZNlT1_DEJiJ9l3hw';
-const viewport = {
-    width: 512,
-    height: 512,
-    longitude: (west + east) / 2,
-    latitude: (north + south) / 2,
-    zoom: 7,
-    pitch: 0,
-    bearing: 0,
-    interactive: true
-};
-
 export default class App extends Component {
+    constructor(props) {
+        super(props);
+        this.$parent = null;
+        this._resizeListener = this.resize.bind(this);
+        this.state = {
+            mapboxApiAccessToken: 'pk.eyJ1IjoibWRjaW90dGkiLCJhIjoiY2l1cWdyamw5MDAxcTJ2bGFmdzJxdGFyNyJ9.2b6aTKZNlT1_DEJiJ9l3hw',
+            viewport: {
+                width: window.innerWidth,
+                height: window.innerHeight,
+                longitude: (west + east) / 2,
+                latitude: (north + south) / 2,
+                zoom: 7,
+                pitch: 0,
+                bearing: 0,
+                interactive: true
+            }
+        };
+    }
+
+    componentDidMount() {
+        this.$parent = ReactDOM.findDOMNode(this).parentElement;
+        window.addEventListener('resize', this._resizeListener);
+        this.resize();
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('resize', this._resizeListener);
+    }
+
+    resize() {
+        this.setState({
+            viewport: Object.assign(this.state.viewport, {
+                width: this.$parent.offsetWidth,
+                height: this.$parent.offsetHeight
+            })
+        })
+    }
+
     render() {
         const bbox = {
             minLng: east,
@@ -67,12 +95,16 @@ export default class App extends Component {
         ];
 
         return (
-            <MapGL {...viewport} mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}>
-                <DeckGL {...viewport} layers={[
+            <MapGL
+                {...this.state.viewport}
+                mapboxApiAccessToken={this.state.mapboxApiAccessToken}
+                onViewportChange={(viewport) => this.setState({viewport})}
+            >
+                <DeckGL {...this.state.viewport} layers={[
                     new ColorMapLayer({
                         id: 'color-layer',
                         bbox,
-                        colorMap: rainbow,
+                        colorMap: cmaps.inferno,
                         time: 0,
                         opacity: 0.9,
                         dataTextureArray

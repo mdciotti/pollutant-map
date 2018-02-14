@@ -48,7 +48,7 @@ export default class LUT {
         this.canvas = document.createElement('canvas');
         this.width = this.canvas.width = 32;
         this.height = this.canvas.height = 256;
-        document.body.appendChild(this.canvas);
+        // document.body.appendChild(this.canvas);
     }
 
     addStop(value, color) {
