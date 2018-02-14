@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title></title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src="twgl-full.js"></script>
+    <script src="dat.gui.js"></script>
+    <script src='colormap.js'></script>
+    <script src='mapbox-gl.js'></script>
+    <link href='mapbox-gl.css' rel='stylesheet' />
+    <!-- <link href="https://fonts.googleapis.com/css?family=Neuton:200,300,400,400i,700|Open+Sans:300,400,600,700" rel="stylesheet"> -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:100,300,400,600" rel="stylesheet"> 
+    <link href='hcan.css' rel='stylesheet' />
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+<!-- 
+<div id="side-panel">
+    <div id="btn-collapse"></div>
+    <!-- <div id="location-search">
+        <div id="search-bar">
+            <input type="text" id="search-field"></input>
+        </div>
+    </div> --
+    <div class="contents">
+        <section id="sites">
+            <h2>Air Quality Index</h2>
+            <div class="site">
+                <div class="AQI">45</div>
+                <ul class="details">
+                    <li><span class="time">10:00 AM</span></li>
+                    <li><span class="site-name">University of Houston</span></li>
+                    <li><span class="AQI-category AQI-good">Good</span></li>
+                </ul>
+                <ul class="pollutants">
+                    <li>O<sub>3</sub> <span class="value">50</span></li>
+                    <li>NO<sub>2</sub> <span class="value">49</span></li>
+                    <li>CO <span class="value">4.0</span></li>
+                    <li>PM<sub>2.5</sub> <span class="value">10.8</span></li>
+                </ul>
+            </div>
+            <div class="site">
+                <div class="AQI">42</div>
+                <ul class="details">
+                    <li><span class="time">10:00 AM</span></li>
+                    <li><span class="site-name">Park Place</span></li>
+                    <li><span class="AQI-category AQI-good">Good</span></li>
+                </ul>
+                <ul class="pollutants">
+                    <li>O<sub>3</sub> <span class="value">51</span></li>
+                    <li>NO<sub>2</sub> <span class="value">37</span></li>
+                    <li>CO <span class="value">3.8</span></li>
+                    <li>PM<sub>2.5</sub> <span class="value">7.9</span></li>
+                </ul>
+            </div>
+        </section>
+        <section id="pollutants">
+
+        </section>
+        <section id="">
+
+        </section>
+    </div>
+</div> -->
+
+<script>
+    let west = -96.652917;
+    let east = -94.291975;
+    let north = 30.997559;
+    let south = 28.845403;
+
+mapboxgl.accessToken = 'pk.eyJ1IjoibWRjaW90dGkiLCJhIjoiY2l1cWdyamw5MDAxcTJ2bGFmdzJxdGFyNyJ9.2b6aTKZNlT1_DEJiJ9l3hw';
+var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/dark-v9',
+    // center: [-103.59179687498357, 40.66995747013945],
+    center: [(west + east) / 2, (north + south) / 2],
+    zoom: 7
+});
+
+map.on('load', function() {
+    console.log(document.getElementById('colormap'));
+    map.addSource('ozone', {
+        type: 'canvas',
+        canvas: 'colormap',
+        animate: true,
+        coordinates: [
+            [west, north],
+            [east, north],
+            [east, south],
+            [west, south]
+        ]
+    });
+});
+</script>
+
+</body>
+</html>
