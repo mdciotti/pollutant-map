@@ -8,6 +8,7 @@ varying vec2 vTextureCoord;
 uniform sampler2D uData0Sampler;
 uniform sampler2D uData1Sampler;
 uniform sampler2D uColorScaleSampler;
+uniform sampler2D uNoDataSampler;
 uniform float k_noise;
 uniform float k_alpha;
 uniform float k_opacity;
@@ -94,6 +95,10 @@ vec4 bicubic(sampler2D texture, vec2 texcoord, vec2 texSize)
     );
 }
 
+float luma(vec4 color) {
+    return dot(color.rgb, vec3(1.0)) / 3.0;
+}
+
 void main() {
     vec4 samp0, samp1, samp;
     if (interpolationMode == 0) {
@@ -113,7 +118,14 @@ void main() {
 
     float val = clamp(samp.r + noise, 0.0, 255.0 / 256.0);
     vec4 mapped_frag = texture2D(uColorScaleSampler, vec2(0.0, val));
-    gl_FragColor = vec4(mapped_frag.rgb, k_opacity);
+    if (samp.g == 0.0) {
+      // gl_FragColor = vec4(vec3(0.0), k_opacity);
+      vec2 coord = gl_FragCoord.xy / 128.0;
+      float noDataSamp = luma(texture2D(uNoDataSampler, vec2(coord.x, 1.0 - coord.y)));
+      gl_FragColor = vec4(noDataSamp * vec3(1.0, 0.0, 0.0), noDataSamp * k_opacity);
+    } else {
+      gl_FragColor = vec4(mapped_frag.rgb, k_opacity * samp.g);
+    }
     // gl_FragColor = vec4(1.0, 0.0, 0.0, samp.r/2.0 + 0.5);
     // gl_FragColor = vec4(vec3(samp.r), 0.9);
 }

@@ -8,22 +8,7 @@ import vertex from './colormap-vertex.glsl';
 export default class ColorMapLayer extends Layer {
     initializeState() {
         const {gl} = this.context;
-        const {dataTextureSize, bbox} = this.props;
-
-        // TODO: retrieve data
-        // loadTextures(gl, {
-        //     urls: [ELEVATION_DATA_IMAGE],
-        //     parameters: {
-        //         parameters: {
-        //             [GL.TEXTURE_MAG_FILTER]: GL.LINEAR,
-        //             [GL.TEXTURE_MIN_FILTER]: GL.LINEAR,
-        //             [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
-        //             [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE
-        //         }
-        //     }
-        // }).then(textures => {
-        //     this.setState({elevationTexture: textures[0]});
-        // });
+        const {dataTextureSize, bbox, colorMap, noDataImage} = this.props;
 
         const model = this.getModel({gl, bbox});
         const {width, height} = dataTextureSize;
@@ -34,15 +19,38 @@ export default class ColorMapLayer extends Layer {
             type: gl.FLOAT,
             dataFormat: gl.RGB
         });
-        
+        const noDataTexture = this.createTexture(gl, {
+            format: gl.RGB,
+            type: gl.UNSIGNED_BYTE,
+            dataFormat: gl.RGB,
+            parameters: {
+                [gl.TEXTURE_MAG_FILTER]: gl.LINEAR,
+                [gl.TEXTURE_MIN_FILTER]: gl.LINEAR,
+                [gl.TEXTURE_WRAP_S]: gl.REPEAT,
+                [gl.TEXTURE_WRAP_T]: gl.REPEAT
+            }
+        });
+
         this.setState({
             model,
             textureFrom,
             textureTo,
             width,
             height,
-            colorMapTexture
+            colorMapTexture,
+            noDataTexture
         });
+
+        // TODO: this should be in its own function so we can re-set it later
+        colorMapTexture.setImageData({
+            pixels: colorMap,
+            width: 1,
+            height: colorMap.length / 3,
+            format: gl.RGB32F,
+            type: gl.FLOAT,
+            dataFormat: gl.RGB
+        });
+
     }
 
     updateState({props, oldProps, changeFlags: {dataChanged, somethingChanged}}) {
@@ -59,37 +67,36 @@ export default class ColorMapLayer extends Layer {
     }
 
     draw({uniforms}) {
-        // if (!data_loaded) return;
         const {gl} = this.context;
-        const {model, textureFrom, textureTo, width, height, delta, timeInterval, colorMapTexture} = this.state;
-        const {dataTextureArray, interpolationMode, colorMap, opacity} = this.props;
+        const {model, textureFrom, textureTo, width, height, delta, timeInterval, colorMapTexture, noDataTexture} = this.state;
+        const {dataTextureArray, interpolationMode, colorMap, opacity, noDataImage} = this.props;
 
         textureFrom.setImageData({
             pixels: dataTextureArray[timeInterval | 0],
             width,
             height,
-            format: gl.R32F,
+            format: gl.RG32F,
             type: gl.FLOAT,
-            dataFormat: gl.RED
+            dataFormat: gl.RG
         });
 
         textureTo.setImageData({
             pixels: dataTextureArray[(timeInterval + 1) | 0],
             width,
             height,
-            format: gl.R32F,
+            format: gl.RG32F,
             type: gl.FLOAT,
-            dataFormat: gl.RED
+            dataFormat: gl.RG
         });
 
-        colorMapTexture.setImageData({
-            pixels: colorMap,
-            width: 1,
-            height: colorMap.length / 3,
-            format: gl.RGB32F,
-            type: gl.FLOAT,
-            dataFormat: gl.RGB
-        });
+        if (noDataImage.complete) {
+            noDataTexture.setImageData({
+                pixels: noDataImage,
+                format: gl.RGB,
+                type: gl.UNSIGNED_BYTE,
+                dataFormat: gl.RGB
+            });
+        }
 
         const parameters = {
             clearDepth: 1.0,
@@ -100,6 +107,7 @@ export default class ColorMapLayer extends Layer {
         uniforms['uData0Sampler'] = textureFrom;
         uniforms['uData1Sampler'] = textureTo;
         uniforms['uColorScaleSampler'] = colorMapTexture;
+        uniforms['uNoDataSampler'] = noDataTexture;
         uniforms['k_noise'] = 0.035;
         uniforms['k_alpha'] = 0.5;
         uniforms['k_opacity'] = opacity;
@@ -119,10 +127,10 @@ export default class ColorMapLayer extends Layer {
         ]);
 
         const texCoords = new Float32Array([
-            1.0, 1.0,
-            1.0, 0.0,
-            0.0, 0.0,
             0.0, 1.0,
+            0.0, 0.0,
+            1.0, 0.0,
+            1.0, 1.0,
         ]);
 
         const geometry = new Geometry({
@@ -147,8 +155,8 @@ export default class ColorMapLayer extends Layer {
 
     createTexture(gl, opt) {
         const textureOptions = Object.assign({
-            format: gl.R32F,
-            dataFormat: gl.RED,
+            format: gl.RG32F,
+            dataFormat: gl.RG,
             type: gl.FLOAT,
             parameters: {
                 // [gl.TEXTURE_MAG_FILTER]: gl.NEAREST,
