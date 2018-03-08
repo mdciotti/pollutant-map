@@ -3,6 +3,8 @@ Pollutant Map
 
 This project aims to make air quality and pollution data available to the public in an easy to access manner.
 
+![Pollutant Map Mockup](https://raw.githubusercontent.com/mdciotti/pollutant-map/master/public/pollutant-map-mockup.png)
+
 
 Project Structure
 -----------------
